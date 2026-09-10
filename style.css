@@ -1,0 +1,449 @@
+/* =========================
+   アプリ全体
+========================= */
+
+.stApp {
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+
+/* =========================
+   中央メインエリア
+========================= */
+
+.block-container {
+    max-width: 1150px;
+
+    background-color: rgba(255, 255, 255, 0.90);
+
+    border-radius: 28px;
+
+    padding: 2rem 2.5rem 3rem 2.5rem;
+
+    margin-top: 18px;
+    margin-bottom: 28px;
+
+    border: 1px solid rgba(150, 205, 230, 0.65);
+
+    box-shadow:
+        0 10px 35px rgba(70, 130, 165, 0.14);
+}
+
+
+/* =========================
+   タイトル
+========================= */
+
+h1 {
+    color: #2f79a8;
+    font-weight: 800;
+}
+
+h2,
+h3 {
+    color: #3f7fa5;
+}
+
+
+/* =========================
+   タイトル横メッセージ
+========================= */
+
+.cat-message {
+    color: #5f7c8e;
+
+    font-size: 17px;
+
+    line-height: 1.7;
+}
+
+
+/* =========================
+   左側メニュー
+========================= */
+
+[data-testid="stSidebar"] {
+    background-color: rgba(231, 246, 255, 0.97);
+
+    border-right: 2px solid #a9d4e9;
+}
+
+[data-testid="stSidebar"] > div:first-child {
+    padding-top: 24px;
+}
+
+
+/* モード選択欄 */
+
+[data-testid="stSidebar"]
+div[data-baseweb="select"] > div {
+    background-color: white;
+
+    border: 2px solid #79bfe2;
+
+    border-radius: 14px;
+
+    min-height: 48px;
+
+    box-shadow:
+        0 3px 10px rgba(80, 140, 180, 0.08);
+}
+
+[data-testid="stSidebar"]
+div[data-baseweb="select"] > div:hover {
+    border-color: #398db8;
+}
+
+
+/* =========================
+   猫検索説明カード
+========================= */
+
+.cat-search-box {
+    background:
+        linear-gradient(
+            135deg,
+            rgba(240, 250, 255, 0.98),
+            rgba(255, 255, 255, 0.98)
+        );
+
+    border: 1px solid #b9ddea;
+
+    border-radius: 20px;
+
+    padding: 18px 22px;
+
+    margin-top: 12px;
+    margin-bottom: 20px;
+
+    box-shadow:
+        0 5px 15px rgba(80, 140, 170, 0.08);
+}
+
+.cat-search-title {
+    color: #347da8;
+
+    font-size: 19px;
+
+    font-weight: 700;
+
+    margin-bottom: 5px;
+}
+
+.cat-search-text {
+    color: #607b8c;
+
+    font-size: 15px;
+
+    line-height: 1.7;
+}
+
+
+/* =========================
+   質問入力欄
+========================= */
+
+.stTextInput input {
+    
+    background-color: #ffffff;
+
+    border: 2px solid #b5d9ea;
+
+    border-radius: 16px;
+
+    min-height: 52px;
+
+    font-size: 16px;
+
+    padding-left: 16px;
+}
+
+.stTextInput input:focus {
+    border-color: #5aadd4;
+
+    box-shadow:
+        0 0 0 2px rgba(90, 173, 212, 0.12);
+}
+
+
+/* =========================
+   検索ボタン
+========================= */
+
+.stButton > button {
+    background:
+        linear-gradient(
+            135deg,
+            #6bbce2,
+            #4fa5d0
+        );
+
+    color: white;
+
+    border: none;
+
+    border-radius: 24px;
+
+    min-height: 50px;
+
+    font-weight: bold;
+
+    padding: 0.6rem 1.8rem;
+
+    box-shadow:
+        0 5px 14px rgba(60, 145, 190, 0.20);
+}
+
+.stButton > button:hover {
+    background:
+        linear-gradient(
+            135deg,
+            #58afd8,
+            #3e94bf
+        );
+
+    color: white;
+
+    border: none;
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================
+   おすすめ質問
+========================= */
+
+.example-title {
+    color: #436f88;
+
+    font-size: 15px;
+
+    font-weight: bold;
+
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.example-chip {
+    background-color: #edf8fd;
+
+    border: 1px solid #c7e1ee;
+
+    border-radius: 22px;
+
+    padding: 9px 12px;
+
+    text-align: center;
+
+    color: #4d6f82;
+
+    font-size: 14px;
+
+    box-shadow:
+        0 2px 8px rgba(70, 130, 160, 0.05);
+}
+
+
+/* =========================
+   AI回答タイトル
+========================= */
+
+.answer-title {
+    background:
+        linear-gradient(
+            90deg,
+            #dff4ff,
+            #f8fcff
+        );
+
+    color: #347da8;
+
+    border-left: 6px solid #6bbce2;
+
+    border-radius: 16px;
+
+    padding: 14px 18px;
+
+    margin-top: 28px;
+    margin-bottom: 16px;
+
+    font-size: 22px;
+
+    font-weight: bold;
+}
+
+
+/* =========================
+   AI回答カード
+========================= */
+
+.answer-card {
+    background-color: rgba(255, 255, 255, 0.97);
+
+    border: 1px solid #cbe4f0;
+
+    border-radius: 22px;
+
+    padding: 22px 26px;
+
+    margin-top: 24px;
+    margin-bottom: 20px;
+
+    box-shadow:
+        0 6px 18px rgba(70, 125, 155, 0.10);
+}
+
+
+/* =========================
+   参考資料
+========================= */
+
+[data-testid="stExpander"] {
+    background-color: rgba(255, 255, 255, 0.96);
+
+    border: 1px solid #c9e2ee;
+
+    border-radius: 18px;
+
+    box-shadow:
+        0 4px 12px rgba(70, 125, 155, 0.07);
+}
+
+
+/* =========================
+   StreamlitのInfo表示
+========================= */
+
+[data-testid="stAlert"] {
+    border-radius: 16px;
+}
+
+
+/* =========================
+   余白調整
+========================= */
+
+[data-testid="stVerticalBlock"] {
+    gap: 0.8rem;
+}
+
+
+/* =========================
+   画面が狭い場合
+========================= */
+
+@media (max-width: 800px) {
+
+    .block-container {
+        padding: 1.5rem;
+
+        border-radius: 20px;
+    }
+
+    .example-chip {
+        font-size: 13px;
+    }
+}
+
+/* =========================
+   メインヘッダー
+========================= */
+
+.main-header {
+    padding: 10px 0 10px 0;
+}
+
+.main-logo {
+    color: #2f79a8;
+    font-size: 42px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    line-height: 1.1;
+}
+
+.main-title {
+    color: #3f718f;
+    font-size: 25px;
+    font-weight: 800;
+    margin-top: 7px;
+}
+
+.main-description {
+    color: #557487;
+    font-size: 17px;
+    margin-top: 15px;
+}
+
+
+/* =========================
+   検索見出し
+========================= */
+
+.search-heading {
+    color: #347da8;
+    font-size: 20px;
+    font-weight: 800;
+    margin-top: 8px;
+}
+
+
+/* =========================
+   質問例見出し
+========================= */
+
+.example-heading {
+    color: #496f86;
+    font-size: 15px;
+    font-weight: 700;
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+
+/* =========================
+   質問例
+========================= */
+
+.example-chip {
+    background: rgba(239, 248, 253, 0.96);
+    border: 1px solid #c3dfec;
+    border-radius: 22px;
+    padding: 10px 8px;
+    text-align: center;
+    color: #486a7d;
+    font-size: 14px;
+}
+
+
+/* =========================
+   AI回答
+========================= */
+
+.answer-title {
+    background: rgba(255, 255, 255, 0.96);
+    color: #347da8;
+
+    border-left: 6px solid #6bbce2;
+    border-radius: 16px;
+
+    padding: 14px 18px;
+
+    margin-top: 28px;
+    margin-bottom: 10px;
+
+    font-size: 23px;
+    font-weight: 800;
+}
+
+/* メイン画面を半透明にする */
+[data-testid="stMain"] {
+    background-color: rgba(255, 255, 255, 0.4) !important;
+}
+
+/* メインコンテンツ部分も透明にする */
+[data-testid="stMainBlockContainer"] {
+    background-color: transparent !important;
+}
