@@ -6,18 +6,14 @@ import streamlit as st
 from dotenv import load_dotenv
 from langchain_chroma import Chroma
 from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_openai import ChatOpenAI
-
+from langchain_google_genai import ChatGoogleGenerativeAI
+from cat_images import display_cat_images
 
 # =========================
 # 基本設定
 # =========================
 
 DATABASE_DIRECTORY = "chroma_db"
-
-CAT_IMAGE_DIRECTORY = Path(
-    "images/cats"
-)
 
 EMBEDDING_MODEL_NAME = (
     "sentence-transformers/"
@@ -26,156 +22,11 @@ EMBEDDING_MODEL_NAME = (
 
 load_dotenv()
 
-
-# =========================
-# 猫画像設定
-# =========================
-
-CAT_IMAGE_DEFINITIONS = [
-    {
-        "name": "マンチカン",
-        "file": "munchkin.png",
-        "keywords": [
-            "マンチカン",
-            "munchkin"
-        ]
-    },
-    {
-        "name": "スコティッシュフォールド",
-        "file": "scottish_fold.png",
-        "keywords": [
-            "スコティッシュフォールド",
-            "スコティッシュ",
-            "scottishfold"
-        ]
-    },
-    {
-        "name": "ラグドール",
-        "file": "ragdoll.png",
-        "keywords": [
-            "ラグドール",
-            "ragdoll"
-        ]
-    },
-    {
-        "name": "メインクーン",
-        "file": "maine_coon.png",
-        "keywords": [
-            "メインクーン",
-            "mainecoon"
-        ]
-    },
-    {
-        "name": "ロシアンブルー",
-        "file": "russian_blue.png",
-        "keywords": [
-            "ロシアンブルー",
-            "russianblue"
-        ]
-    },
-    {
-        "name": "ノルウェージャンフォレストキャット",
-        "file": "norwegian_forest.png",
-        "keywords": [
-            "ノルウェージャンフォレストキャット",
-            "ノルウェージャン",
-            "norwegianforestcat"
-        ]
-    },
-    {
-        "name": "ベンガル",
-        "file": "bengal.png",
-        "keywords": [
-            "ベンガル",
-            "bengal"
-        ]
-    },
-    {
-        "name": "シャム",
-        "file": "siamese.png",
-        "keywords": [
-            "シャム",
-            "シャム猫",
-            "siamese"
-        ]
-    },
-    {
-        "name": "ブリティッシュショートヘア",
-        "file": "british_shorthair.png",
-        "keywords": [
-            "ブリティッシュショートヘア",
-            "ブリティッシュ",
-            "britishshorthair"
-        ]
-    },
-    {
-        "name": "アビシニアン",
-        "file": "abyssinian.png",
-        "keywords": [
-            "アビシニアン",
-            "abyssinian"
-        ]
-    },
-    {
-        "name": "白猫",
-        "file": "white_cat.png",
-        "keywords": [
-            "白猫",
-            "白い猫",
-            "whitecat"
-        ]
-    },
-    {
-        "name": "黒猫",
-        "file": "black_cat.png",
-        "keywords": [
-            "黒猫",
-            "黒い猫",
-            "blackcat"
-        ]
-    },
-    {
-        "name": "ハチワレ",
-        "file": "hachiware.png",
-        "keywords": [
-            "ハチワレ",
-            "はちわれ",
-            "八割れ",
-            "tuxedocat"
-        ]
-    },
-    {
-        "name": "三毛猫",
-        "file": "calico.png",
-        "keywords": [
-            "三毛猫",
-            "三毛",
-            "みけねこ",
-            "calicocat"
-        ]
-    },
-    {
-        "name": "サビ猫",
-        "file": "tortoiseshell.png",
-        "keywords": [
-            "サビ猫",
-            "さび猫",
-            "サビ",
-            "さびねこ",
-            "tortoiseshellcat"
-        ]
-    }
-]
-
-
 # =========================
 # CSS読み込み
 # =========================
 
 def load_css(css_path: str) -> None:
-    """
-    外部CSSファイルを読み込む。
-    """
 
     with open(
         css_path,
@@ -219,158 +70,6 @@ def get_base64_image(
             image_file.read()
         ).decode()
 
-
-# =========================
-# 質問から猫を判定
-# =========================
-
-def normalize_text(
-    text: str
-) -> str:
-    """
-    猫名を判定しやすい形に整える。
-    """
-
-    return (
-        text
-        .lower()
-        .replace(" ", "")
-        .replace("　", "")
-        .replace("-", "")
-        .replace("_", "")
-    )
-
-
-def find_cat_images(
-    question: str
-) -> list:
-    """
-    質問文に含まれる猫種・毛色を判定し、
-    表示対象の画像情報を返す。
-    """
-
-    normalized_question = normalize_text(
-        question
-    )
-
-    matched_cats = []
-
-    for cat in CAT_IMAGE_DEFINITIONS:
-
-        for keyword in cat["keywords"]:
-
-            normalized_keyword = normalize_text(
-                keyword
-            )
-
-            if (
-                normalized_keyword
-                in normalized_question
-            ):
-
-                matched_cats.append(
-                    cat
-                )
-
-                break
-
-    return matched_cats
-
-
-# =========================
-# 猫画像を表示
-# =========================
-
-def display_cat_images(
-    question: str
-) -> None:
-    """
-    質問に含まれている猫の画像を表示する。
-    """
-
-    matched_cats = find_cat_images(
-        question
-    )
-
-    if not matched_cats:
-        return
-
-    show_html(
-        """
-        <div class="answer-title">
-            🐱 質問に登場した猫
-        </div>
-        """
-    )
-
-    # 1匹の場合
-    if len(matched_cats) == 1:
-
-        cat = matched_cats[0]
-
-        image_path = (
-            CAT_IMAGE_DIRECTORY
-            / cat["file"]
-        )
-
-        if image_path.exists():
-
-            st.image(
-                str(image_path),
-                caption=cat["name"],
-                width=650
-            )
-
-        else:
-
-            st.warning(
-                f"{cat['name']}の画像が"
-                f"見つかりません："
-                f"{image_path}"
-            )
-
-    # 2匹以上の場合
-    else:
-
-        columns = st.columns(
-            min(
-                len(matched_cats),
-                3
-            )
-        )
-
-        for index, cat in enumerate(
-            matched_cats
-        ):
-
-            image_path = (
-                CAT_IMAGE_DIRECTORY
-                / cat["file"]
-            )
-
-            column = columns[
-                index
-                % len(columns)
-            ]
-
-            with column:
-
-                if image_path.exists():
-
-                    st.image(
-                        str(image_path),
-                        caption=cat["name"],
-                        use_container_width=True
-                    )
-
-                else:
-
-                    st.warning(
-                        f"{cat['name']}の"
-                        "画像がありません"
-                    )
-
-
 # =========================
 # Chroma読み込み
 # =========================
@@ -386,8 +85,7 @@ def load_vectorstore() -> Chroma:
 
         raise FileNotFoundError(
             "chroma_dbが見つかりません。"
-            "先にcreate_db.pyを"
-            "実行してください。"
+            "先にcreate_db.pyを実行してください。"
         )
 
     embeddings = HuggingFaceEmbeddings(
@@ -403,46 +101,162 @@ def load_vectorstore() -> Chroma:
 
 
 # =========================
-# OpenAI読み込み
+# AI読み込み
 # =========================
 
 @st.cache_resource
-def load_llm() -> ChatOpenAI:
+def load_llm() -> ChatGoogleGenerativeAI:
 
-    llm = ChatOpenAI(
-        model="gpt-4.1-mini",
-        temperature=0
+    return ChatGoogleGenerativeAI(
+        model="gemini-3.5-flash-lite"
     )
 
-    return llm
-
 
 # =========================
-# 資料検索
+# Query Expansion
+# 検索語を意味的に拡張
 # =========================
 
-def search_documents(
-    vectorstore: Chroma,
-    question: str,
-    search_count: int = 5
+def expand_query(
+    llm: ChatGoogleGenerativeAI,
+    question: str
 ) -> list:
 
     """
-    Chromaから候補を広めに検索し、
-    質問に含まれる言葉も考慮して
-    上位5件を返す。
+    ユーザーの質問と同じ意味を持つ
+    検索表現を最大4件生成する。
+
+    例:
+    くろねこの特徴
+    ↓
+    黒猫の特徴
+    クロネコの特徴
+    黒い猫の特徴
     """
 
-    # Chromaから30件取得
-    candidates = (
-        vectorstore.similarity_search(
-            question,
-            k=30
-        )
-    )
+    prompt = f"""
+あなたは日本語検索のQuery Expansionを行うAIです。
 
-    # 質問から不要な表現を除く
-    cleaned_question = (
+次の質問について、
+意味を変えずに検索で使える別表現を作ってください。
+
+特に以下を考慮してください。
+
+・ひらがな、カタカナ、漢字の表記違い
+・同じ意味を持つ自然な日本語表現
+・猫種名、毛色、模様などの一般的な表記
+・質問の意味を勝手に広げない
+・新しい情報を追加しない
+・最大4件まで
+・説明は書かない
+・1行に1つだけ書く
+
+【質問】
+{question}
+"""
+
+    try:
+
+        response = llm.invoke(
+            prompt
+        )
+
+        content = response.content
+
+        # Geminiがリスト形式で返した場合
+        if isinstance(content, list):
+
+            text_parts = []
+
+            for item in content:
+
+                if isinstance(item, dict):
+
+                    text = item.get(
+                        "text",
+                        ""
+                    )
+
+                    if text:
+                        text_parts.append(text)
+
+                elif isinstance(item, str):
+
+                    text_parts.append(item)
+
+            generated_text = "\n".join(
+                text_parts
+            )
+
+        else:
+
+            generated_text = str(
+                content
+            )
+
+        generated_lines = (
+            generated_text
+            .strip()
+            .splitlines()
+        )
+
+        expanded_queries = []
+
+        # 元の質問は必ず残す
+        expanded_queries.append(
+            question.strip()
+        )
+
+        for line in generated_lines:
+
+            cleaned = (
+                line
+                .strip()
+                .lstrip("・")
+                .lstrip("-")
+                .strip()
+            )
+
+            # 「1.」などを除く
+            if (
+                len(cleaned) >= 2
+                and cleaned[0].isdigit()
+                and cleaned[1] in [".", "．", "、", ")"]
+            ):
+                cleaned = cleaned[2:].strip()
+
+            if (
+                cleaned
+                and cleaned not in expanded_queries
+            ):
+
+                expanded_queries.append(
+                    cleaned
+                )
+
+            if len(expanded_queries) >= 5:
+                break
+
+        return expanded_queries
+
+    except Exception:
+
+        # Query Expansionに失敗しても
+        # 元の質問だけで検索できる
+        return [
+            question.strip()
+        ]
+
+
+# =========================
+# 不要表現を除く
+# =========================
+
+def clean_question(
+    question: str
+) -> str:
+
+    return (
         question
         .replace("について", "")
         .replace("教えてください", "")
@@ -454,116 +268,178 @@ def search_documents(
         .strip()
     )
 
-    scored_results = []
 
-    for index, document in enumerate(
-        candidates
+# =========================
+# 資料検索
+# =========================
+
+def search_documents(
+    vectorstore: Chroma,
+    llm: ChatGoogleGenerativeAI,
+    question: str,
+    search_count: int = 5
+) -> tuple[list, list]:
+
+    """
+    1. Query Expansion
+    2. 各検索表現でSimilarity Search
+    3. 候補を統合
+    4. キーワード一致も加点
+    5. 上位5件を返す
+    """
+
+    # -------------------------
+    # Query Expansion
+    # -------------------------
+
+    expanded_queries = expand_query(
+        llm,
+        question
+    )
+
+    scored_documents = {}
+
+    # -------------------------
+    # 複数の検索語で
+    # Similarity Search
+    # -------------------------
+
+    for query_number, query in enumerate(
+        expanded_queries
     ):
 
-        content = (
-            document.page_content.strip()
-        )
-
-        # Chroma順位を基本点にする
-        score = 30 - index
-
-        # 質問全体の一致
-        if (
-            cleaned_question
-            and cleaned_question in content
-        ):
-            score += 50
-
-        # 2〜8文字の部分一致
-        for length in range(
-            min(
-                8,
-                len(cleaned_question)
-            ),
-            1,
-            -1
-        ):
-
-            for start in range(
-                len(cleaned_question)
-                - length
-                + 1
-            ):
-
-                keyword = (
-                    cleaned_question[
-                        start:
-                        start + length
-                    ]
-                )
-
-                if keyword in content:
-                    score += length
-
-        scored_results.append(
-            (
-                score,
-                document
+        candidates = (
+            vectorstore.similarity_search(
+                query,
+                k=30
             )
         )
 
-    # 点数が高い順
-    scored_results.sort(
-        key=lambda item: item[0],
+        cleaned_query = clean_question(
+            query
+        )
+
+        for index, document in enumerate(
+            candidates
+        ):
+
+            file_name = (
+                document.metadata.get(
+                    "source_file",
+                    ""
+                )
+            )
+
+            page_number = (
+                document.metadata.get(
+                    "page"
+                )
+            )
+
+            content = (
+                document.page_content
+                .strip()
+            )
+
+            key = (
+                file_name,
+                page_number,
+                content
+            )
+
+            # Chroma順位による基本点
+            score = 30 - index
+
+            # 元質問を少し優先
+            if query_number == 0:
+                score += 5
+
+            # 検索表現全体が一致
+            if (
+                cleaned_query
+                and cleaned_query in content
+            ):
+                score += 50
+
+            # 2〜8文字の部分一致
+            for length in range(
+                min(
+                    8,
+                    len(cleaned_query)
+                ),
+                1,
+                -1
+            ):
+
+                for start in range(
+                    len(cleaned_query)
+                    - length
+                    + 1
+                ):
+
+                    keyword = (
+                        cleaned_query[
+                            start:
+                            start + length
+                        ]
+                    )
+
+                    if keyword in content:
+                        score += length
+
+            # 同じチャンクが
+            # 別検索語でも見つかった場合
+            # その結果も少し評価する
+            if key in scored_documents:
+
+                old_score = (
+                    scored_documents[
+                        key
+                    ]["score"]
+                )
+
+                scored_documents[
+                    key
+                ]["score"] = (
+                    max(
+                        old_score,
+                        score
+                    )
+                    + 3
+                )
+
+            else:
+
+                scored_documents[key] = {
+                    "score": score,
+                    "document": document
+                }
+
+    # -------------------------
+    # 点数順に並べる
+    # -------------------------
+
+    ranked_results = sorted(
+        scored_documents.values(),
+        key=lambda item: item["score"],
         reverse=True
     )
 
-    unique_results = []
+    final_results = [
+        item["document"]
+        for item in ranked_results[
+            :search_count
+        ]
+    ]
 
-    seen = set()
-
-    for score, document in scored_results:
-
-        file_name = (
-            document.metadata.get(
-                "source_file",
-                ""
-            )
-        )
-
-        page_number = (
-            document.metadata.get(
-                "page"
-            )
-        )
-
-        content = (
-            document.page_content.strip()
-        )
-
-        key = (
-            file_name,
-            page_number,
-            content
-        )
-
-        if key in seen:
-            continue
-
-        seen.add(
-            key
-        )
-
-        unique_results.append(
-            document
-        )
-
-        if (
-            len(unique_results)
-            >= search_count
-        ):
-            break
-
-    return unique_results
+    return (
+        final_results,
+        expanded_queries
+    )
 
 
 # =========================
-# AIへ渡す参考資料を作成
+# AIへ渡す参考資料
 # =========================
 
 def create_context(
@@ -595,9 +471,7 @@ def create_context(
 
         else:
 
-            page_text = (
-                "ページ不明"
-            )
+            page_text = "ページ不明"
 
         context_part = f"""
 【ファイル名】
@@ -624,15 +498,11 @@ def create_context(
 # =========================
 
 def generate_answer(
-    llm: ChatOpenAI,
+    llm: ChatGoogleGenerativeAI,
     question: str,
     context: str,
     mode: str
 ) -> str:
-
-    # -------------------------
-    # 猫図鑑検索
-    # -------------------------
 
     if mode == "猫図鑑検索":
 
@@ -667,10 +537,6 @@ def generate_answer(
 ・ファイル名（ページ番号）
 """
 
-    # -------------------------
-    # 猫との暮らし相談
-    # -------------------------
-
     elif mode == "猫との暮らし相談":
 
         system_instruction = """
@@ -704,10 +570,6 @@ def generate_answer(
 参考資料:
 ・ファイル名（ページ番号）
 """
-
-    # -------------------------
-    # 猫種比較
-    # -------------------------
 
     else:
 
@@ -763,17 +625,125 @@ def generate_answer(
 「資料からは確認できません」
 と回答してください
 ・最後に必ず参考ファイル名とページ番号を示してください
+・見出しの後は必ず改行してください
+・箇条書きの「・」は必ず行の先頭に置いてください
+・箇条書きは1項目ごとに必ず改行してください
+・複数の箇条書きを同じ行に書かないでください
 """
 
     response = llm.invoke(
         prompt
     )
 
-    return response.content
+    content = response.content
+
+    # =========================
+    # Geminiの回答を文字列にする
+    # =========================
+
+    if isinstance(content, list):
+
+        text_parts = []
+
+        for item in content:
+
+            if isinstance(item, dict):
+
+                text = item.get(
+                    "text",
+                    ""
+                )
+
+                if text:
+                    text_parts.append(text)
+
+            elif isinstance(item, str):
+
+                text_parts.append(item)
+
+        answer_text = "\n".join(
+            text_parts
+        )
+
+    else:
+
+        answer_text = str(
+            content
+        )
+
+
+    # =========================
+    # 表示用に改行を整理
+    # =========================
+
+    # 「 ・」を箇条書きごとの改行にする
+    answer_text = answer_text.replace(
+        " ・",
+        "\n・"
+    )
+
+    # Geminiがすでに作った余分な空行を削除
+    while "\n\n" in answer_text:
+        answer_text = answer_text.replace(
+            "\n\n",
+            "\n"
+        )
+
+    # 見出しの後を1回だけ改行
+    headings = [
+        "答え:",
+        "特徴:",
+        "補足:",
+        "参考資料:",
+        "ご案内:",
+        "考えられる理由:",
+        "対応方法:",
+        "比較する猫:",
+        "主な違い:",
+        "共通点:",
+        "選ぶときのポイント:"
+    ]
+
+    for heading in headings:
+        answer_text = answer_text.replace(
+            heading,
+            heading + "\n"
+        )
+
+    # 最後にもう一度、余分な空行を削除
+    while "\n\n" in answer_text:
+        answer_text = answer_text.replace(
+            "\n\n",
+            "\n"
+        )
+
+    return answer_text.strip()
 
 
 # =========================
-# 検索された資料を表示
+# 検索語表示
+# =========================
+
+def display_expanded_queries(
+    queries: list
+) -> None:
+
+    with st.expander(
+        "🔎 検索に使った表現を見る"
+    ):
+
+        for index, query in enumerate(
+            queries,
+            start=1
+        ):
+
+            st.write(
+                f"{index}. {query}"
+            )
+
+
+# =========================
+# 検索された資料表示
 # =========================
 
 def display_sources(
@@ -810,9 +780,7 @@ def display_sources(
 
             else:
 
-                page_text = (
-                    "ページ不明"
-                )
+                page_text = "ページ不明"
 
             st.markdown(
                 f"### 🐾 検索結果 {index}"
@@ -838,10 +806,6 @@ def display_sources(
 # =========================
 
 def main():
-
-    # =========================
-    # ページ設定
-    # =========================
 
     st.set_page_config(
         page_title="CAT RAG｜猫図鑑AI",
@@ -915,7 +879,7 @@ def main():
         )
 
         placeholder = (
-            "例：ハチワレって猫の種類なの？"
+            "例：はちわれって猫の種類なの？"
         )
 
     elif mode == "猫との暮らし相談":
@@ -1075,7 +1039,7 @@ def main():
         show_html(
             """
             <div class="example-chip">
-                🐾 ハチワレって猫の種類？
+                🐾 はちわれって猫の種類？
             </div>
             """
         )
@@ -1085,7 +1049,7 @@ def main():
         show_html(
             """
             <div class="example-chip">
-                🐾 三毛猫の特徴を教えて
+                🐾 くろねこの特徴を教えて
             </div>
             """
         )
@@ -1128,12 +1092,14 @@ def main():
             "🐱 猫の資料を検索しています..."
         ):
 
-            results = (
-                search_documents(
-                    vectorstore=vectorstore,
-                    question=question,
-                    search_count=5
-                )
+            (
+                results,
+                expanded_queries
+            ) = search_documents(
+                vectorstore=vectorstore,
+                llm=llm,
+                question=question,
+                search_count=5
             )
 
             if not results:
@@ -1159,13 +1125,14 @@ def main():
                     mode=mode
                 )
             )
-
+        
         # =========================
-        # 猫画像
+        # 猫画像表示
         # =========================
 
         display_cat_images(
-            question
+            question,
+            expanded_queries
         )
 
         # =========================
@@ -1184,9 +1151,23 @@ def main():
             border=True
         ):
 
-            st.markdown(
-                answer
+            formatted_answer = answer.replace(
+                "\n",
+                "<br>"
             )
+
+            st.markdown(
+                formatted_answer,
+                unsafe_allow_html=True
+            )
+
+        # =========================
+        # 検索に使った表現
+        # =========================
+
+        display_expanded_queries(
+            expanded_queries
+        )
 
         # =========================
         # 参考資料
